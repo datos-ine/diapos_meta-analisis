@@ -1,0 +1,20 @@
+project:
+  title: "diapos_curso"
+
+editor: visual
+
+format: 
+  revealjs: 
+    title-slide-attributes: 
+      data-background-image: fondo_ppt_title.png
+    center-title-slide: true
+    # background-image: regression_14601857.png
+    # background-size: contain
+    code-link: true
+    chalkboard: false
+    logo: logos_ine.svg
+    incremental: true
+    slide-number: true
+    theme: simple
+    css: custom.css
+

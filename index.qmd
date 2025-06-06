@@ -1,0 +1,537 @@
+---
+title: "Meta-análisis en R"
+bibliography: references.bib
+---
+
+```{r}
+#| echo: false
+source("setup.R")
+```
+
+# Clase 1 {.titulo-clase background-image="forest_plot.svg" background-size="150px" background-repeat="repeat" background-opacity=".75"}
+
+------------------------------------------------------------------------
+
+## ¿Qué es un meta-análisis?
+
+-   Una herramienta estadística para **sintetizar cuantitativamente** los resultados de estudios independientes incluidos en una revisión sistemática.
+
+-   La **unidad de análisis** son los **estudios científicos**.
+
+-   Su objetivo es obtener un **estimador numérico** que resuma los resultados individuales.
+
+-   Aplicable a investigaciones **cuantitativas,** con diseños de estudio similares y que evalúen la misma medida de asociación.
+
+------------------------------------------------------------------------
+
+### ✔️ Ventajas
+
+-   Sintetiza cuantitativamente la evidencia disponible.
+
+-   Aumenta la **potencia estadística**.
+
+-   Mejora la **precisión** de los estimadores.
+
+-   Identifica **patrones** no evidentes en estudios individuales.
+
+-   Evalúa la **consistencia** de los resultados en diferentes contextos.
+
+------------------------------------------------------------------------
+
+### ❌ Desventajas
+
+-   Su validez depende de la **calidad metodológica** de los estudios.
+
+-   Afectado por **sesgo de publicación**.
+
+-   La **heterogeneidad** entre estudios puede dificultar la interpretación.
+
+-   Requiere criterios de inclusión y exclusión rigurosos.
+
+-   No corrige errores metodológicos de los estudios primarios.
+
+------------------------------------------------------------------------
+
+## Estimadores de efecto
+
+-   Los estudios incluidos en la revisión sistemática pueden diferir en diseño, población objetivo y/o medición de variables.
+
+-   Esta variabilidad impide el uso de métodos estadísticos convencionales.
+
+-   Los modelos de meta-análisis se basan en **estimadores de efecto** (*effect sizes*) que indican la **magnitud y dirección** de la relación entre dos variables.
+
+------------------------------------------------------------------------
+
+-   Los estimadores de efecto deben ser:
+
+    -   **Comparables**
+    -   **Computables**
+    -   **Confiables**
+    -   **Interpretables**
+
+-   Podemos calcular estimadores de efecto para: proporción, correlación, diferencia de medias, *odds-ratio* (OR), riesgo relativo (RR) y tasa de incidencia (IRR).
+
+------------------------------------------------------------------------
+
+## Modelo de efectos fijos
+
+-   Asume que los estimadores individuales corresponden a un **mismo efecto verdadero** y toda la variación se da a causa del **error muestral**.
+
+-   El estimador global ($\theta$) se calcula como el promedio ponderado de los efectos individuales ($y_i$):
+
+    $$
+    \theta = \frac{\sum{y_i w_i}}{\sum{w_i}}\qquad donde~w_i = 1/var_i
+    $$
+
+-   Los estudios con **menor varianza** tienen **mayor peso** en la estimación global.
+
+------------------------------------------------------------------------
+
+## Modelo de efectos aleatorios
+
+-   En la práctica, existen fuentes de variabilidad adicionales al error aleatorio, por lo que los modelos de efectos fijos no suelen ser apropiados.
+
+-   Esta variabilidad se conoce como **heterogeneidad estadística** o **tau-cuadrado** ($\tau^2$).
+
+-   Los modelos de efectos aleatorios tienen en cuenta la heterogeneidad y suponen que existe una **distribución de efectos verdaderos**.
+
+------------------------------------------------------------------------
+
+-   💡 El **objetivo** será estimar la **media de la distribución de efectos verdaderos**.
+
+-   La ponderación de los estudios entonces tiene en cuenta la varianza dentro del estudio ($var_i$) y la heterogeneidad entre estudios ($\tau^2$):
+
+    $$w^*_i = \frac{1}{var_i + \tau^2}$$
+
+-   Los métodos más comunes para estimar $\tau^2$ son:
+
+    -   **Máxima verosimilitud restringida** (REML)
+    -   **DerSimonian y Laird**
+
+------------------------------------------------------------------------
+
+### Medidas de heterogeneidad
+
+-   **tau-cuadrado** ($\tau^2$)
+
+    -   Estima la **varianza entre efectos verdaderos**.
+
+    -   Se utiliza para ponderar estudios en modelos de efectos aleatorios
+
+-   **Q de Cochran**:
+
+    -   Contrasta la hipótesis de efecto común.
+
+    -   Sensible al número de estudios.
+
+    -   No mide magnitud de la heterogeneidad.
+
+------------------------------------------------------------------------
+
+-   **I-cuadrado** ($I^2$)
+
+    -   Cuantifica el porcentaje de variabilidad atribuible a la heterogeneidad real.
+
+    -   Independiente del número de estudios.
+
+    -   Interpretación:
+
+        -   25%: baja
+
+        -   50%: moderada
+
+        -   75%: alta
+
+-   $H^2$: Razón entre la varianza total observada y la varianza esperada bajo el supuesto de homogeneidad.
+
+------------------------------------------------------------------------
+
+## Meta-análisis en R
+
+-   **R** [@base] es un lenguaje de programación estadístico interpretado, orientado a objetos, multiplataforma y de código abierto.
+
+-   **RStudio** es una interfaz multiplataforma y de código abierto que facilita el uso de R. Incluye editor de scripts, consola, entorno, explorador de archivos, panel de resultados y ayuda, entre otros.
+
+-   `meta` [@meta] es un paquete de R que permite ajustar modelos de meta-análisis de manera sencilla y directa.
+
+------------------------------------------------------------------------
+
+## Paquete `meta`
+
+-   Ajusta por defecto modelos de efectos fijos y aleatorios e indicadores de heterogeneidad.
+
+-   Incluye la dependencia `metadat` [@metadat], con las bases de datos de ejemplo que usaremos durante las prácticas.
+
+-   Instalación (**una sola vez** por computadora):
+
+    ```{r}
+    #| eval: false
+    install.packages("meta")
+    ```
+
+-   Carga del paquete (**cada vez** que abro sesión de R):
+
+    ```{r}
+    #| eval: false
+    library(meta)
+    ```
+
+------------------------------------------------------------------------
+
+### Función `metagen()`
+
+-   Función básica del paquete `meta`.
+
+-   Ajusta modelos para estimadores de efecto pre-calculados.
+
+-   Requiere transformación logarítmica para proporciones, OR y riesgos relativos.
+
+-   En caso de datos ausentes, permite inferir estimadores de efecto y/o sus errores estándar a partir de intervalos de confianza ($95\%~IC$), medianas, $p$-valores, rangos y/o rangos intercuartílicos ($IQR$).
+
+------------------------------------------------------------------------
+
+#### Argumentos principales
+
+```{r}
+#| eval: false
+metagen(
+  TE,           # <1>
+  seTE,         # <2>
+  studlab,      # <3>
+  data,         # <4>
+  sm,           # <5>
+  common = TRUE,       # <6>
+  random = TRUE,       # <7>  
+  ...)       
+```
+
+1.  Estimador de efecto.
+2.  Error estándar del estimador.
+3.  Identificador único del estudio (opcional).
+4.  Tabla de datos (opcional).
+5.  Estimador de efecto global (`"OR"`, `"RR"`, etc.).
+6.  Ajustar modelo de efectos fijos (`TRUE`/`FALSE`).
+7.  Ajustar modelo de efectos aleatorios (`TRUE`/`FALSE`).
+
+------------------------------------------------------------------------
+
+### Ejemplo
+
+-   Cargamos el paquete `meta`:
+
+    ```{r}
+    library(meta)
+    ```
+
+-   Cargamos el dataset "`dat.konstantopoulos2011`" sobre impacto de modificación del calendario escolar en el rendimiento académico:
+
+    ```{r}
+    datos <- dat.konstantopoulos2011
+    # Nombres de columnas
+    names(datos)
+    ```
+
+-   Nuestras variables de interés son `yi` (estimador de efecto) y `vi` (varianza del estimador).
+
+------------------------------------------------------------------------
+
+-   Ajustamos el modelo de meta-análisis:
+
+::: fragment
+```{r}
+#| code-line-numbers: "1-2,8"
+mod <- metagen(TE = yi,    # Estimador de efecto         
+               seTE = vi,  # Varianza del estimador
+               sm = "SMD", # Diferencia de medias estandarizada
+               studlab = study,    
+               common = TRUE,   
+               random = TRUE,    
+               backtransf = TRUE, 
+               data = datos)
+```
+:::
+
+-   Los argumentos resaltados son los que necesitamos definir para correr el modelo, el resto son opcionales ya que tienen opciones por defecto.
+
+------------------------------------------------------------------------
+
+-   Podemos acceder a la salida del modelo llamando el objeto `mod` o usando `summary(mod)`:
+
+::: fragment
+```{r}
+#| echo: false
+mod
+```
+:::
+
+------------------------------------------------------------------------
+
+#### Componentes de la salida
+
+-   `k`: número de estudios incluidos en el modelo.
+
+-   `Common effect model`: coeficientes, $95\%~IC$ y $p$-valor del modelo de efectos fijos.
+
+-   `Random effects model`: coeficientes, $95\%~IC$ y $p$-valor del modelo de efectos aleatorios.
+
+-   `Quantifying heterogeneity (with 95%-CIs)`: medidas de heterogeneidad (para decidir si uso fijo o random).
+
+-   `Details of meta-analysis methods`: Resumen de los métodos estadísticos aplicados.
+
+------------------------------------------------------------------------
+
+### *Forest plots*
+
+-   Los resultados de un meta-análisis se representan gráficamente usando *forest plots*.
+
+-   Cada fila representa un estudio con su estimador de efecto y $95\%~IC$ (cuadrados).
+
+-   El estimador global se representa con un rombo.
+
+-   Puede incluirse la tabla de datos con los resultados para cada estudio y su ponderación.
+
+-   Se generan con la función `forest()`.
+
+------------------------------------------------------------------------
+
+## 
+
+::: panel-tabset
+## Código
+
+```{r}
+#| eval: false
+forest(mod,
+       common = FALSE,                 # Omitir modelo de efectos fijos
+       leftcols = "studlab",           # Columnas panel izquierdo         
+       col.diamond = "magenta",        # Color del estimador global
+       col.square = "yellow",          # Color estimadores individuales
+       smlab = "Diferencia de medias", # Etiqueta del estimador
+       hetstat = TRUE,                 # Mostrar indicadores heterogeneidad
+       calcwidth.hetstat = TRUE        # Añadir espacio entre paneles
+)
+```
+
+## Forest plot
+
+```{r}
+#| echo: false
+mod2 <- metagen(TE = yi,   
+               seTE = vi,      
+               studlab = study,    
+               common = TRUE,   
+               random = TRUE,    
+               backtransf = TRUE, 
+               data = datos |> filter(district == 58)
+               )
+
+forest(mod2,
+       common = FALSE,
+       leftcols = "studlab", 
+       col.diamond = "magenta",
+       col.square = "yellow",
+       smlab = "Diferencia de medias",
+       calcwidth.hetstat = TRUE
+       
+       )
+```
+:::
+
+------------------------------------------------------------------------
+
+## Funciones `metaxxx()`
+
+-   Permiten ajustar modelos de meta-análisis a partir de datos crudos sin necesidad de transformaciones previas.
+
+-   Se nombran siguiendo la estructura `metaxxx`, donde `xxx`es el tipo de datos o indicador.
+
+-   Ajustan modelos de efectos fijos y aleatorios y estiman indicadores de heterogeneidad.
+
+-   Devuelven los resultados en la escala original de los datos, aplicando la transformación inversa (argumento `backtransf = TRUE`).
+
+------------------------------------------------------------------------
+
+-   Para estudios descriptivos
+
+    -   `metacor()`: coeficientes de correlación.
+    -   `metaprop()`: proporciones simples (p. ej., prevalencias).
+    -   `metarate()`: tasas de incidencia.
+
+-   Para estudios analíticos
+
+    -   `metacont()`: datos continuos (p. ej., diferencia de medias).
+    -   `metabin()`: datos binarios (OR, RR, diferencia de riesgos)
+    -   `metainc()`: razón de tasas de incidencia
+
+-   Para **tiempo hasta el evento** se utiliza `metagen()` con log-*hazard ratios.*
+
+------------------------------------------------------------------------
+
+## Práctica 1: Correlación entre concienciación y adherencia a la medicación {style="font-size: 0.8em"}
+
+::: panel-tabset
+## Ajuste del modelo
+
+```{r}
+# Cargar datos 
+datos_cor <- dat.molloy2014
+
+# Nombres de columnas
+names(datos_cor)
+
+# Ajustar modelo
+mod_cor <- metacor(
+  cor = ri,           # Coeficientes de correlación
+  n = ni,             # Tamaño muestral
+  sm = "ZCOR",        # Estimador de efecto
+  studlab = authors,  # Identificador del estudio
+  data = datos_cor    # Tabla de datos
+)
+```
+
+## Resultados
+
+```{r}
+#| echo: false
+mod_cor
+```
+:::
+
+------------------------------------------------------------------------
+
+### Forest plot
+
+```{r}
+#| echo: false
+forest(mod_cor)
+```
+
+------------------------------------------------------------------------
+
+## Práctica 2: Prevalencia de la distrofia muscular de Duchenne en recién nacidos {style="font-size: 0.8em"}
+
+::: panel-tabset
+## Ajuste del modelo
+
+```{r}
+# Cargar datos 
+datos_prev <- dat.crisafulli2020
+
+# Nombres de columnas
+names(datos_prev)
+
+# Ajustar modelo
+mod_prev <- metaprop(
+  event = cases,      # Individuos con la condición
+  n = total,          # Tamaño muestral
+  sm = "PLO",         # Estimador de efecto
+  pscale = 1000,      # Expresar prevalencia cada 1000 hab
+  studlab = study,    # Identificador del estudio
+  data = datos_prev   # Tabla de datos
+)
+```
+
+## Resultados
+
+```{r}
+#| echo: false
+mod_prev
+```
+:::
+
+------------------------------------------------------------------------
+
+### Forest plot
+
+```{r}
+#| echo: false
+forest(mod_prev)
+```
+
+------------------------------------------------------------------------
+
+## Práctica 3: efecto de los diuréticos en la prevención de preeclampsia {style="font-size: 0.8em"}
+
+::: panel-tabset
+## Ajuste del modelo
+
+```{r}
+# Cargar datos 
+datos_or <- dat.collins1985b
+
+# Nombres de columnas
+names(datos_or)
+
+# Ajustar modelo
+mod_or <- metabin(
+  event.e = pre.xti,  # Expuestos con el evento
+  n.e = pre.nti,      # Tamaño muestral expuestos
+  event.c = pre.xci,  # No expuestos con el evento
+  n.c = pre.nci,      # Tamaño muestral no expuestos
+  sm = "OR",          # Estimador de efecto
+  studlab = author,   # Identificador del estudio
+  data = datos_or    # Tabla de datos
+)
+```
+
+## Resultados
+
+```{r}
+#| echo: false
+mod_or
+```
+:::
+
+------------------------------------------------------------------------
+
+### Forest plot
+
+```{r}
+#| echo: false
+forest(mod_or)
+```
+
+------------------------------------------------------------------------
+
+## Práctica 4: Incidencia de infecciones sanguíneas asociadas al uso de catéteres {style="font-size: 0.8em"}
+
+::: panel-tabset
+## Ajuste del modelo
+
+```{r}
+# Cargar datos 
+datos_inc <- dat.nielweise2008
+
+# Nombres de columnas
+names(datos_inc)
+
+# Ajustar modelo
+mod_inc <- metainc(
+  event.e = x1i,       # Casos en grupo expuesto
+  time.e = t1i,        # Tiempo-persona en grupo expuesto
+  event.c = x2i,       # Casos en grupo control
+  time.c = t2i,        # Tiempo-persona en grupo control
+  sm = "IRR",          # Estimador de efecto
+  studlab = authors,     # Identificador del estudio
+  data = datos_inc     # Tabla de datos
+)
+```
+
+## Resultados
+
+```{r}
+#| echo: false
+mod_inc
+```
+:::
+
+---
+
+### Forest plot
+
+```{r}
+#| echo: false
+forest(mod_inc)
+```
+
+## Referencias
