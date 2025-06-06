@@ -8,10 +8,9 @@ format:
     title-slide-attributes: 
       data-background-image: fondo_ppt_title.png
     center-title-slide: true
-    # background-image: regression_14601857.png
-    # background-size: contain
     code-link: true
-    chalkboard: false
+    chalkboard:
+      theme: whiteboard
     logo: logos_ine.svg
     incremental: true
     slide-number: true
