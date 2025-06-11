@@ -280,28 +280,32 @@
 <section id="modelo-de-efectos-fijos" class="slide level2">
 <h2>Modelo de efectos fijos</h2>
 <ul>
-<li class="fragment"><p>Asume que los estimadores individuales corresponden a un <strong>mismo efecto verdadero</strong> y toda la variación se da a causa del <strong>error muestral</strong>.</p></li>
+<li class="fragment"><p>Asume que los estimadores individuales tienen un <strong>mismo efecto verdadero</strong> <span class="math inline">\(\theta\)</span> y la variabilidad se debe solo al <strong>error muestral</strong> <span class="math inline">\(\epsilon_k\)</span>:</p>
+<p><span class="math display">\[
+y_k = \theta + \epsilon_k
+\]</span></p></li>
 <li class="fragment"><p>El estimador global (<span class="math inline">\(\theta\)</span>) se calcula como el promedio ponderado de los efectos individuales (<span class="math inline">\(y_i\)</span>):</p>
 <p><span class="math display">\[
-\theta = \frac{\sum{y_i w_i}}{\sum{w_i}}\qquad donde~w_i = 1/var_i
+\theta = \frac{\sum{y_k w_k}}{\sum{w_k}}\qquad donde~w_k = \frac{1}{S^2_k}
 \]</span></p></li>
-<li class="fragment"><p>Los estudios con <strong>menor varianza</strong> tienen <strong>mayor peso</strong> en la estimación global.</p></li>
 </ul>
 </section>
 <section id="modelo-de-efectos-aleatorios" class="slide level2">
 <h2>Modelo de efectos aleatorios</h2>
 <ul>
-<li class="fragment"><p>En la práctica, existen fuentes de variabilidad adicionales al error aleatorio, por lo que los modelos de efectos fijos no suelen ser apropiados.</p></li>
-<li class="fragment"><p>Esta variabilidad se conoce como <strong>heterogeneidad estadística</strong> o <strong>tau-cuadrado</strong> (<span class="math inline">\(\tau^2\)</span>).</p></li>
-<li class="fragment"><p>Los modelos de efectos aleatorios tienen en cuenta la heterogeneidad y suponen que existe una <strong>distribución de efectos verdaderos</strong>.</p></li>
+<li class="fragment"><p>Los modelos de efectos fijos no suelen aplicarse a situaciones reales donde existen fuentes adicionales de variabilidad al error muestral (<span class="math inline">\(\epsilon_k\)</span>).</p></li>
+<li class="fragment"><p>El modelo de efectos aleatorios asume no existe un efecto verdadero común sino una <strong>distribución de efectos verdaderos</strong> con media <span class="math inline">\(\mu\)</span> y varianza <span class="math inline">\(\tau^2\)</span> (<strong>heterogeneidad</strong>):</p>
+<p><span class="math display">\[
+y_k = \theta_k + \epsilon_k \qquad~ó~bien:~y_k = y_k = \mu + \tau_k + \epsilon_k
+\]</span></p></li>
 </ul>
 </section>
 <section class="slide level2">
 
 <ul>
 <li class="fragment"><p>💡 El <strong>objetivo</strong> será estimar la <strong>media de la distribución de efectos verdaderos</strong>.</p></li>
-<li class="fragment"><p>La ponderación de los estudios entonces tiene en cuenta la varianza dentro del estudio (<span class="math inline">\(var_i\)</span>) y la heterogeneidad entre estudios (<span class="math inline">\(\tau^2\)</span>):</p>
-<p><span class="math display">\[w^*_i = \frac{1}{var_i + \tau^2}\]</span></p></li>
+<li class="fragment"><p>Los estudios se ponderan teniendo en cuenta la varianza dentro del estudio (<span class="math inline">\(S^2_k\)</span>) y la heterogeneidad entre estudios (<span class="math inline">\(\tau^2\)</span>):</p>
+<p><span class="math display">\[w^*_k = \frac{1}{S^2_k + \tau^2}\]</span></p></li>
 <li class="fragment"><p>Los métodos más comunes para estimar <span class="math inline">\(\tau^2\)</span> son:</p>
 <ul>
 <li class="fragment"><strong>Máxima verosimilitud restringida</strong> (REML)</li>
