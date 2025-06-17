@@ -280,32 +280,28 @@
 <section id="modelo-de-efectos-fijos" class="slide level2">
 <h2>Modelo de efectos fijos</h2>
 <ul>
-<li class="fragment"><p>Asume que los estimadores individuales tienen un <strong>mismo efecto verdadero</strong> <span class="math inline">\(\theta\)</span> y la variabilidad se debe solo al <strong>error muestral</strong> <span class="math inline">\(\epsilon_k\)</span>:</p>
-<p><span class="math display">\[
-y_k = \theta + \epsilon_k
-\]</span></p></li>
+<li class="fragment"><p>Asume que los estimadores individuales corresponden a un <strong>mismo efecto verdadero</strong> y toda la variación se da a causa del <strong>error muestral</strong>.</p></li>
 <li class="fragment"><p>El estimador global (<span class="math inline">\(\theta\)</span>) se calcula como el promedio ponderado de los efectos individuales (<span class="math inline">\(y_i\)</span>):</p>
 <p><span class="math display">\[
-\theta = \frac{\sum{y_k w_k}}{\sum{w_k}}\qquad donde~w_k = \frac{1}{S^2_k}
+\theta = \frac{\sum{y_i w_i}}{\sum{w_i}}\qquad donde~w_i = 1/var_i
 \]</span></p></li>
+<li class="fragment"><p>Los estudios con <strong>menor varianza</strong> tienen <strong>mayor peso</strong> en la estimación global.</p></li>
 </ul>
 </section>
 <section id="modelo-de-efectos-aleatorios" class="slide level2">
 <h2>Modelo de efectos aleatorios</h2>
 <ul>
-<li class="fragment"><p>Los modelos de efectos fijos no suelen aplicarse a situaciones reales donde existen fuentes adicionales de variabilidad al error muestral (<span class="math inline">\(\epsilon_k\)</span>).</p></li>
-<li class="fragment"><p>El modelo de efectos aleatorios asume no existe un efecto verdadero común sino una <strong>distribución de efectos verdaderos</strong> con media <span class="math inline">\(\mu\)</span> y varianza <span class="math inline">\(\tau^2\)</span> (<strong>heterogeneidad</strong>):</p>
-<p><span class="math display">\[
-y_k = \theta_k + \epsilon_k \qquad~ó~bien:~y_k = y_k = \mu + \tau_k + \epsilon_k
-\]</span></p></li>
+<li class="fragment"><p>En la práctica, existen fuentes de variabilidad adicionales al error aleatorio, por lo que los modelos de efectos fijos no suelen ser apropiados.</p></li>
+<li class="fragment"><p>Esta variabilidad se conoce como <strong>heterogeneidad estadística</strong> o <strong>tau-cuadrado</strong> (<span class="math inline">\(\tau^2\)</span>).</p></li>
+<li class="fragment"><p>Los modelos de efectos aleatorios tienen en cuenta la heterogeneidad y suponen que existe una <strong>distribución de efectos verdaderos</strong>.</p></li>
 </ul>
 </section>
 <section class="slide level2">
 
 <ul>
 <li class="fragment"><p>💡 El <strong>objetivo</strong> será estimar la <strong>media de la distribución de efectos verdaderos</strong>.</p></li>
-<li class="fragment"><p>Los estudios se ponderan teniendo en cuenta la varianza dentro del estudio (<span class="math inline">\(S^2_k\)</span>) y la heterogeneidad entre estudios (<span class="math inline">\(\tau^2\)</span>):</p>
-<p><span class="math display">\[w^*_k = \frac{1}{S^2_k + \tau^2}\]</span></p></li>
+<li class="fragment"><p>La ponderación de los estudios entonces tiene en cuenta la varianza dentro del estudio (<span class="math inline">\(var_i\)</span>) y la heterogeneidad entre estudios (<span class="math inline">\(\tau^2\)</span>):</p>
+<p><span class="math display">\[w^*_i = \frac{1}{var_i + \tau^2}\]</span></p></li>
 <li class="fragment"><p>Los métodos más comunes para estimar <span class="math inline">\(\tau^2\)</span> son:</p>
 <ul>
 <li class="fragment"><strong>Máxima verosimilitud restringida</strong> (REML)</li>
@@ -328,6 +324,7 @@ y_k = \theta_k + \epsilon_k \qquad~ó~bien:~y_k = y_k = \mu + \tau_k + \epsilon_
 <li class="fragment"><p>Sensible al número de estudios.</p></li>
 <li class="fragment"><p>No mide magnitud de la heterogeneidad.</p></li>
 </ul></li>
+<li class="fragment"><p><span class="math inline">\(H^2\)</span>: Razón entre la varianza total observada y la varianza esperada bajo el supuesto de homogeneidad.</p></li>
 </ul>
 </section>
 <section class="slide level2">
@@ -344,7 +341,7 @@ y_k = \theta_k + \epsilon_k \qquad~ó~bien:~y_k = y_k = \mu + \tau_k + \epsilon_
 <li class="fragment"><p>75%: alta</p></li>
 </ul></li>
 </ul></li>
-<li class="fragment"><p><span class="math inline">\(H^2\)</span>: Razón entre la varianza total observada y la varianza esperada bajo el supuesto de homogeneidad.</p></li>
+<li class="fragment"><p><strong>Intervalo de predicción</strong>: Rango de valores que podrán tomar los estimadores de estudios futuros.</p></li>
 </ul>
 </section>
 <section id="meta-análisis-en-r" class="slide level2">
@@ -454,14 +451,15 @@ y_k = \theta_k + \epsilon_k \qquad~ó~bien:~y_k = y_k = \mu + \tau_k + \epsilon_
 </ul>
 <div class="fragment">
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb6" data-code-line-numbers="1-2,8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href=""></a>mod <span class="ot">&lt;-</span> <span class="fu">metagen</span>(<span class="at">TE =</span> yi,    <span class="co"># Estimador de efecto         </span></span>
+<div class="sourceCode cell-code" id="cb6" data-code-line-numbers="1-2,7-8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href=""></a>mod <span class="ot">&lt;-</span> <span class="fu">metagen</span>(<span class="at">TE =</span> yi,    <span class="co"># Estimador de efecto         </span></span>
 <span id="cb6-2"><a href=""></a>               <span class="at">seTE =</span> vi,  <span class="co"># Varianza del estimador</span></span>
 <span id="cb6-3"><a href=""></a>               <span class="at">sm =</span> <span class="st">"SMD"</span>, <span class="co"># Diferencia de medias estandarizada</span></span>
 <span id="cb6-4"><a href=""></a>               <span class="at">studlab =</span> study,    </span>
 <span id="cb6-5"><a href=""></a>               <span class="at">common =</span> <span class="cn">TRUE</span>,   </span>
 <span id="cb6-6"><a href=""></a>               <span class="at">random =</span> <span class="cn">TRUE</span>,    </span>
 <span id="cb6-7"><a href=""></a>               <span class="at">backtransf =</span> <span class="cn">TRUE</span>, </span>
-<span id="cb6-8"><a href=""></a>               <span class="at">data =</span> datos)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb6-8"><a href=""></a>               <span class="at">prediction =</span> <span class="cn">TRUE</span>, <span class="co"># Calcular intervalo de predicción</span></span>
+<span id="cb6-9"><a href=""></a>               <span class="at">data =</span> datos)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <ul>
@@ -481,6 +479,7 @@ y_k = \theta_k + \epsilon_k \qquad~ó~bien:~y_k = y_k = \mu + \tau_k + \epsilon_
                          SMD             95%-CI      z p-value
 Common effect model  -0.0133 [-0.0140; -0.0126] -38.82       0
 Random effects model  0.1219 [ 0.0365;  0.2074]   2.80  0.0052
+Prediction interval          [-0.5328;  0.7767]               
 
 Quantifying heterogeneity (with 95%-CIs):
  tau^2 = 0.1048 [0.0739; 0.1588]; tau = 0.3238 [0.2719; 0.3985]
@@ -494,7 +493,8 @@ Details of meta-analysis methods:
 - Inverse variance method
 - Restricted maximum-likelihood estimator for tau^2
 - Q-Profile method for confidence interval of tau^2 and tau
-- Calculation of I^2 based on Q</code></pre>
+- Calculation of I^2 based on Q
+- Prediction interval based on t-distribution (df = 55)</code></pre>
 </div>
 </div>
 </div>
@@ -598,12 +598,13 @@ Details of meta-analysis methods:
 </div>
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href=""></a><span class="co"># Ajustar modelo</span></span>
 <span id="cb11-2"><a href=""></a>mod_cor <span class="ot">&lt;-</span> <span class="fu">metacor</span>(</span>
-<span id="cb11-3"><a href=""></a>  <span class="at">cor =</span> ri,           <span class="co"># Coeficientes de correlación</span></span>
-<span id="cb11-4"><a href=""></a>  <span class="at">n =</span> ni,             <span class="co"># Tamaño muestral</span></span>
-<span id="cb11-5"><a href=""></a>  <span class="at">sm =</span> <span class="st">"ZCOR"</span>,        <span class="co"># Estimador de efecto</span></span>
-<span id="cb11-6"><a href=""></a>  <span class="at">studlab =</span> authors,  <span class="co"># Identificador del estudio</span></span>
-<span id="cb11-7"><a href=""></a>  <span class="at">data =</span> datos_cor    <span class="co"># Tabla de datos</span></span>
-<span id="cb11-8"><a href=""></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb11-3"><a href=""></a>  <span class="at">cor =</span> ri,            <span class="co"># Coeficientes de correlación</span></span>
+<span id="cb11-4"><a href=""></a>  <span class="at">n =</span> ni,              <span class="co"># Tamaño muestral</span></span>
+<span id="cb11-5"><a href=""></a>  <span class="at">sm =</span> <span class="st">"ZCOR"</span>,         <span class="co"># Estimador de efecto</span></span>
+<span id="cb11-6"><a href=""></a>  <span class="at">studlab =</span> authors,   <span class="co"># Identificador del estudio</span></span>
+<span id="cb11-7"><a href=""></a>  <span class="at">data =</span> datos_cor,    <span class="co"># Tabla de datos</span></span>
+<span id="cb11-8"><a href=""></a>  <span class="at">prediction =</span> <span class="cn">TRUE</span>    <span class="co"># Calcular intervalo de predicción</span></span>
+<span id="cb11-9"><a href=""></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="tabset-2-2">
@@ -612,9 +613,10 @@ Details of meta-analysis methods:
 <pre><code>Number of studies: k = 16
 Number of observations: o = 3509
 
-                        COR           95%-CI    z  p-value
-Common effect model  0.1245 [0.0916; 0.1572] 7.36 &lt; 0.0001
-Random effects model 0.1488 [0.0878; 0.2087] 4.75 &lt; 0.0001
+                        COR            95%-CI    z  p-value
+Common effect model  0.1245 [ 0.0916; 0.1572] 7.36 &lt; 0.0001
+Random effects model 0.1488 [ 0.0878; 0.2087] 4.75 &lt; 0.0001
+Prediction interval         [-0.0534; 0.3393]              
 
 Quantifying heterogeneity (with 95%-CIs):
  tau^2 = 0.0081 [0.0017; 0.0378]; tau = 0.0901 [0.0412; 0.1944]
@@ -629,6 +631,7 @@ Details of meta-analysis methods:
 - Restricted maximum-likelihood estimator for tau^2
 - Q-Profile method for confidence interval of tau^2 and tau
 - Calculation of I^2 based on Q
+- Prediction interval based on t-distribution (df = 15)
 - Fisher's z transformation of correlations</code></pre>
 </div>
 </div>
@@ -658,13 +661,14 @@ Details of meta-analysis methods:
 </div>
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href=""></a><span class="co"># Ajustar modelo</span></span>
 <span id="cb15-2"><a href=""></a>mod_prev <span class="ot">&lt;-</span> <span class="fu">metaprop</span>(</span>
-<span id="cb15-3"><a href=""></a>  <span class="at">event =</span> cases,      <span class="co"># Individuos con la condición</span></span>
-<span id="cb15-4"><a href=""></a>  <span class="at">n =</span> total,          <span class="co"># Tamaño muestral</span></span>
-<span id="cb15-5"><a href=""></a>  <span class="at">sm =</span> <span class="st">"PLO"</span>,         <span class="co"># Estimador de efecto</span></span>
-<span id="cb15-6"><a href=""></a>  <span class="at">pscale =</span> <span class="dv">1000</span>,      <span class="co"># Expresar prevalencia cada 1000 hab</span></span>
-<span id="cb15-7"><a href=""></a>  <span class="at">studlab =</span> study,    <span class="co"># Identificador del estudio</span></span>
-<span id="cb15-8"><a href=""></a>  <span class="at">data =</span> datos_prev   <span class="co"># Tabla de datos</span></span>
-<span id="cb15-9"><a href=""></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-3"><a href=""></a>  <span class="at">event =</span> cases,       <span class="co"># Individuos con la condición</span></span>
+<span id="cb15-4"><a href=""></a>  <span class="at">n =</span> total,           <span class="co"># Tamaño muestral</span></span>
+<span id="cb15-5"><a href=""></a>  <span class="at">sm =</span> <span class="st">"PLO"</span>,          <span class="co"># Estimador de efecto</span></span>
+<span id="cb15-6"><a href=""></a>  <span class="at">pscale =</span> <span class="dv">1000</span>,       <span class="co"># Expresar prevalencia cada 1000 hab</span></span>
+<span id="cb15-7"><a href=""></a>  <span class="at">studlab =</span> study,     <span class="co"># Identificador del estudio</span></span>
+<span id="cb15-8"><a href=""></a>  <span class="at">data =</span> datos_prev,   <span class="co"># Tabla de datos</span></span>
+<span id="cb15-9"><a href=""></a>  <span class="at">prediction =</span> <span class="cn">TRUE</span>    <span class="co"># Calcular intervalo de predicción</span></span>
+<span id="cb15-10"><a href=""></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="tabset-3-2">
@@ -677,6 +681,7 @@ Number of events: e = 1545
                      events           95%-CI
 Common effect model  0.2290 [0.2179; 0.2407]
 Random effects model 0.2246 [0.2082; 0.2422]
+Prediction interval         [0.1753; 0.2877]
 
 Quantifying heterogeneity (with 95%-CIs):
  tau^2 = 0.0130 [0.0000; 0.0376]; tau = 0.1139 [0.0000; 0.1938]
@@ -691,6 +696,7 @@ Details of meta-analysis methods:
 - Restricted maximum-likelihood estimator for tau^2
 - Q-Profile method for confidence interval of tau^2 and tau
 - Calculation of I^2 based on Q
+- Prediction interval based on t-distribution (df = 25)
 - Logit transformation
 - Events per 1000 observations</code></pre>
 </div>
@@ -723,14 +729,15 @@ Details of meta-analysis methods:
 </div>
 <div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href=""></a><span class="co"># Ajustar modelo</span></span>
 <span id="cb19-2"><a href=""></a>mod_or <span class="ot">&lt;-</span> <span class="fu">metabin</span>(</span>
-<span id="cb19-3"><a href=""></a>  <span class="at">event.e =</span> pre.xti,  <span class="co"># Expuestos con el evento</span></span>
-<span id="cb19-4"><a href=""></a>  <span class="at">n.e =</span> pre.nti,      <span class="co"># Tamaño muestral expuestos</span></span>
-<span id="cb19-5"><a href=""></a>  <span class="at">event.c =</span> pre.xci,  <span class="co"># No expuestos con el evento</span></span>
-<span id="cb19-6"><a href=""></a>  <span class="at">n.c =</span> pre.nci,      <span class="co"># Tamaño muestral no expuestos</span></span>
-<span id="cb19-7"><a href=""></a>  <span class="at">sm =</span> <span class="st">"OR"</span>,          <span class="co"># Estimador de efecto</span></span>
-<span id="cb19-8"><a href=""></a>  <span class="at">studlab =</span> author,   <span class="co"># Identificador del estudio</span></span>
-<span id="cb19-9"><a href=""></a>  <span class="at">data =</span> datos_or    <span class="co"># Tabla de datos</span></span>
-<span id="cb19-10"><a href=""></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb19-3"><a href=""></a>  <span class="at">event.e =</span> pre.xti,   <span class="co"># Expuestos con el evento</span></span>
+<span id="cb19-4"><a href=""></a>  <span class="at">n.e =</span> pre.nti,       <span class="co"># Tamaño muestral expuestos</span></span>
+<span id="cb19-5"><a href=""></a>  <span class="at">event.c =</span> pre.xci,   <span class="co"># No expuestos con el evento</span></span>
+<span id="cb19-6"><a href=""></a>  <span class="at">n.c =</span> pre.nci,       <span class="co"># Tamaño muestral no expuestos</span></span>
+<span id="cb19-7"><a href=""></a>  <span class="at">sm =</span> <span class="st">"OR"</span>,           <span class="co"># Estimador de efecto</span></span>
+<span id="cb19-8"><a href=""></a>  <span class="at">studlab =</span> author,    <span class="co"># Identificador del estudio</span></span>
+<span id="cb19-9"><a href=""></a>  <span class="at">data =</span> datos_or,     <span class="co"># Tabla de datos</span></span>
+<span id="cb19-10"><a href=""></a>  <span class="at">prediction =</span> <span class="cn">TRUE</span>    <span class="co"># Calcular intervalo de predicción</span></span>
+<span id="cb19-11"><a href=""></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="tabset-4-2">
@@ -743,6 +750,7 @@ Number of events: e = 636
                          OR           95%-CI     z  p-value
 Common effect model  0.6677 [0.5620; 0.7932] -4.60 &lt; 0.0001
 Random effects model 0.5956 [0.3843; 0.9233] -2.32   0.0205
+Prediction interval         [0.1520; 2.3343]               
 
 Quantifying heterogeneity (with 95%-CIs):
  tau^2 = 0.3008 [0.0723; 2.2027]; tau = 0.5484 [0.2689; 1.4842]
@@ -757,7 +765,8 @@ Details of meta-analysis methods:
 - Inverse variance method (random effects model)
 - Restricted maximum-likelihood estimator for tau^2
 - Q-Profile method for confidence interval of tau^2 and tau
-- Calculation of I^2 based on Q</code></pre>
+- Calculation of I^2 based on Q
+- Prediction interval based on t-distribution (df = 8)</code></pre>
 </div>
 </div>
 </div>
@@ -791,9 +800,10 @@ Details of meta-analysis methods:
 <span id="cb23-5"><a href=""></a>  <span class="at">event.c =</span> x2i,       <span class="co"># Casos en grupo control</span></span>
 <span id="cb23-6"><a href=""></a>  <span class="at">time.c =</span> t2i,        <span class="co"># Tiempo-persona en grupo control</span></span>
 <span id="cb23-7"><a href=""></a>  <span class="at">sm =</span> <span class="st">"IRR"</span>,          <span class="co"># Estimador de efecto</span></span>
-<span id="cb23-8"><a href=""></a>  <span class="at">studlab =</span> authors,     <span class="co"># Identificador del estudio</span></span>
-<span id="cb23-9"><a href=""></a>  <span class="at">data =</span> datos_inc     <span class="co"># Tabla de datos</span></span>
-<span id="cb23-10"><a href=""></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb23-8"><a href=""></a>  <span class="at">studlab =</span> authors,   <span class="co"># Identificador del estudio</span></span>
+<span id="cb23-9"><a href=""></a>  <span class="at">data =</span> datos_inc,    <span class="co"># Tabla de datos</span></span>
+<span id="cb23-10"><a href=""></a>  <span class="at">prediction =</span> <span class="cn">TRUE</span>    <span class="co"># Calcular intervalo de predicción</span></span>
+<span id="cb23-11"><a href=""></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 <div id="tabset-5-2">
@@ -805,6 +815,7 @@ Number of events: e = 125
                         IRR           95%-CI     z p-value
 Common effect model  0.6602 [0.4608; 0.9459] -2.26  0.0236
 Random effects model 0.6728 [0.4314; 1.0494] -1.75  0.0806
+Prediction interval         [0.2796; 1.6192]              
 
 Quantifying heterogeneity (with 95%-CIs):
  tau^2 = 0.0936 [0.0000; 1.4845]; tau = 0.3060 [0.0000; 1.2184]
@@ -819,7 +830,8 @@ Details of meta-analysis methods:
 - Inverse variance method (random effects model)
 - Restricted maximum-likelihood estimator for tau^2
 - Q-Profile method for confidence interval of tau^2 and tau
-- Calculation of I^2 based on Q</code></pre>
+- Calculation of I^2 based on Q
+- Prediction interval based on t-distribution (df = 8)</code></pre>
 </div>
 </div>
 </div>
