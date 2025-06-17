@@ -126,6 +126,8 @@ source("setup.R")
 
     -   No mide magnitud de la heterogeneidad.
 
+-   $H^2$: Razón entre la varianza total observada y la varianza esperada bajo el supuesto de homogeneidad.
+
 ------------------------------------------------------------------------
 
 -   **I-cuadrado** ($I^2$)
@@ -142,7 +144,7 @@ source("setup.R")
 
         -   75%: alta
 
--   $H^2$: Razón entre la varianza total observada y la varianza esperada bajo el supuesto de homogeneidad.
+-   **Intervalo de predicción**: Rango de valores que podrán tomar los estimadores de estudios futuros.
 
 ------------------------------------------------------------------------
 
@@ -239,7 +241,7 @@ metagen(
 
 ::: fragment
 ```{r}
-#| code-line-numbers: "1-2,8"
+#| code-line-numbers: "1-2,7-8"
 mod <- metagen(TE = yi,    # Estimador de efecto         
                seTE = vi,  # Varianza del estimador
                sm = "SMD", # Diferencia de medias estandarizada
@@ -247,6 +249,7 @@ mod <- metagen(TE = yi,    # Estimador de efecto
                common = TRUE,   
                random = TRUE,    
                backtransf = TRUE, 
+               prediction = TRUE, # Calcular intervalo de predicción
                data = datos)
 ```
 :::
@@ -381,11 +384,12 @@ names(datos_cor)
 
 # Ajustar modelo
 mod_cor <- metacor(
-  cor = ri,           # Coeficientes de correlación
-  n = ni,             # Tamaño muestral
-  sm = "ZCOR",        # Estimador de efecto
-  studlab = authors,  # Identificador del estudio
-  data = datos_cor    # Tabla de datos
+  cor = ri,            # Coeficientes de correlación
+  n = ni,              # Tamaño muestral
+  sm = "ZCOR",         # Estimador de efecto
+  studlab = authors,   # Identificador del estudio
+  data = datos_cor,    # Tabla de datos
+  prediction = TRUE    # Calcular intervalo de predicción
 )
 ```
 
@@ -422,12 +426,13 @@ names(datos_prev)
 
 # Ajustar modelo
 mod_prev <- metaprop(
-  event = cases,      # Individuos con la condición
-  n = total,          # Tamaño muestral
-  sm = "PLO",         # Estimador de efecto
-  pscale = 1000,      # Expresar prevalencia cada 1000 hab
-  studlab = study,    # Identificador del estudio
-  data = datos_prev   # Tabla de datos
+  event = cases,       # Individuos con la condición
+  n = total,           # Tamaño muestral
+  sm = "PLO",          # Estimador de efecto
+  pscale = 1000,       # Expresar prevalencia cada 1000 hab
+  studlab = study,     # Identificador del estudio
+  data = datos_prev,   # Tabla de datos
+  prediction = TRUE    # Calcular intervalo de predicción
 )
 ```
 
@@ -464,13 +469,14 @@ names(datos_or)
 
 # Ajustar modelo
 mod_or <- metabin(
-  event.e = pre.xti,  # Expuestos con el evento
-  n.e = pre.nti,      # Tamaño muestral expuestos
-  event.c = pre.xci,  # No expuestos con el evento
-  n.c = pre.nci,      # Tamaño muestral no expuestos
-  sm = "OR",          # Estimador de efecto
-  studlab = author,   # Identificador del estudio
-  data = datos_or    # Tabla de datos
+  event.e = pre.xti,   # Expuestos con el evento
+  n.e = pre.nti,       # Tamaño muestral expuestos
+  event.c = pre.xci,   # No expuestos con el evento
+  n.c = pre.nci,       # Tamaño muestral no expuestos
+  sm = "OR",           # Estimador de efecto
+  studlab = author,    # Identificador del estudio
+  data = datos_or,     # Tabla de datos
+  prediction = TRUE    # Calcular intervalo de predicción
 )
 ```
 
@@ -512,8 +518,9 @@ mod_inc <- metainc(
   event.c = x2i,       # Casos en grupo control
   time.c = t2i,        # Tiempo-persona en grupo control
   sm = "IRR",          # Estimador de efecto
-  studlab = authors,     # Identificador del estudio
-  data = datos_inc     # Tabla de datos
+  studlab = authors,   # Identificador del estudio
+  data = datos_inc,    # Tabla de datos
+  prediction = TRUE    # Calcular intervalo de predicción
 )
 ```
 
