@@ -80,7 +80,7 @@ source("setup.R")
 -   El estimador global ($\theta$) se calcula como el promedio ponderado de los efectos individuales ($y_i$):
 
     $$
-    \theta = \frac{\sum{y_i w_i}}{\sum{w_i}}\qquad donde~w_i = 1/var_i
+    \theta = \frac{\sum{y_i w_i}}{\sum{w_i}}\qquad donde~w_i = 1/S^2_i
     $$
 
 -   Los estudios con **menor varianza** tienen **mayor peso** en la estimación global.
@@ -99,9 +99,9 @@ source("setup.R")
 
 -   💡 El **objetivo** será estimar la **media de la distribución de efectos verdaderos**.
 
--   La ponderación de los estudios entonces tiene en cuenta la varianza dentro del estudio ($var_i$) y la heterogeneidad entre estudios ($\tau^2$):
+-   La ponderación de los estudios entonces tiene en cuenta la varianza dentro del estudio ($S^2_i$) y la heterogeneidad entre estudios ($\tau^2$):
 
-    $$w^*_i = \frac{1}{var_i + \tau^2}$$
+    $$w^*_i = \frac{1}{S^2_i + \tau^2}$$
 
 -   Los métodos más comunes para estimar $\tau^2$ son:
 
@@ -112,11 +112,7 @@ source("setup.R")
 
 ### Medidas de heterogeneidad
 
--   **tau-cuadrado** ($\tau^2$)
-
-    -   Estima la **varianza entre efectos verdaderos**.
-
-    -   Se utiliza para ponderar estudios en modelos de efectos aleatorios
+-   **tau-cuadrado** ($\tau^2$): Varianza entre efectos verdaderos.
 
 -   **Q de Cochran**:
 
@@ -126,7 +122,7 @@ source("setup.R")
 
     -   No mide magnitud de la heterogeneidad.
 
--   $H^2$: Razón entre la varianza total observada y la varianza esperada bajo el supuesto de homogeneidad.
+-   $H^2$: Razón entre la varianza total observada y la esperada bajo el supuesto de homogeneidad.
 
 ------------------------------------------------------------------------
 
@@ -138,13 +134,25 @@ source("setup.R")
 
     -   Interpretación:
 
-        -   25%: baja
+        -   **0-25%**: baja heterogeneidad
 
-        -   50%: moderada
+        -   **25-50%**: heterogeneidad moderada
 
-        -   75%: alta
+        -   **50-75%**: heterogeneidad sustancial
 
--   **Intervalo de predicción**: Rango de valores que podrán tomar los estimadores de estudios futuros.
+        -   **\>75%**: alta heterogeneidad
+
+---
+
+-   **Intervalo de predicción**:
+
+    -   Predice el rango esperado del efecto en un nuevo estudio, considerando la evidencia existente.
+
+    -   A diferencia del intervalo de confianza del efecto global, incorpora la **heterogeneidad entre estudios** ($\tau^2$).
+
+    -   Complementa la interpretación del $I^2$ y $\tau^2$.
+
+    -   Indica si los resultados son consistentes entre estudios.
 
 ------------------------------------------------------------------------
 
@@ -241,7 +249,7 @@ metagen(
 
 ::: fragment
 ```{r}
-#| code-line-numbers: "1-2,7-8"
+#| code-line-numbers: "1-2,7-9"
 mod <- metagen(TE = yi,    # Estimador de efecto         
                seTE = vi,  # Varianza del estimador
                sm = "SMD", # Diferencia de medias estandarizada
@@ -325,7 +333,8 @@ mod2 <- metagen(TE = yi,
                common = TRUE,   
                random = TRUE,    
                backtransf = TRUE, 
-               data = datos |> filter(district == 58)
+               data = datos,
+               subset = district == 58
                )
 
 forest(mod2,
@@ -334,23 +343,21 @@ forest(mod2,
        col.diamond = "magenta",
        col.square = "yellow",
        smlab = "Diferencia de medias",
-       calcwidth.hetstat = TRUE
-       
-       )
+       calcwidth.hetstat = TRUE)
 ```
 :::
 
 ------------------------------------------------------------------------
 
-## Funciones `metaxxx()`
+## Funciones `meta___()`
 
--   Permiten ajustar modelos de meta-análisis a partir de datos crudos sin necesidad de transformaciones previas.
+-   Permiten ajustar modelos de meta-análisis a partir de datos crudos.
 
--   Se nombran siguiendo la estructura `metaxxx`, donde `xxx`es el tipo de datos o indicador.
+-   Se nombran siguiendo la estructura `meta__`, donde `___` es el tipo de datos o estimador de efecto.
 
--   Ajustan modelos de efectos fijos y aleatorios y estiman indicadores de heterogeneidad.
+-   Realizan las transformaciones necesarias de los datos sin que tengamos que manipularlos previamente.
 
--   Devuelven los resultados en la escala original de los datos, aplicando la transformación inversa (argumento `backtransf = TRUE`).
+-   Presentan los resultados en la escala original de los datos, aplicando la transformación inversa (argumento `backtransf = TRUE`).
 
 ------------------------------------------------------------------------
 
