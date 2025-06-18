@@ -283,7 +283,7 @@
 <li class="fragment"><p>Asume que los estimadores individuales corresponden a un <strong>mismo efecto verdadero</strong> y toda la variación se da a causa del <strong>error muestral</strong>.</p></li>
 <li class="fragment"><p>El estimador global (<span class="math inline">\(\theta\)</span>) se calcula como el promedio ponderado de los efectos individuales (<span class="math inline">\(y_i\)</span>):</p>
 <p><span class="math display">\[
-\theta = \frac{\sum{y_i w_i}}{\sum{w_i}}\qquad donde~w_i = 1/var_i
+\theta = \frac{\sum{y_i w_i}}{\sum{w_i}}\qquad donde~w_i = 1/S^2_i
 \]</span></p></li>
 <li class="fragment"><p>Los estudios con <strong>menor varianza</strong> tienen <strong>mayor peso</strong> en la estimación global.</p></li>
 </ul>
@@ -300,8 +300,8 @@
 
 <ul>
 <li class="fragment"><p>💡 El <strong>objetivo</strong> será estimar la <strong>media de la distribución de efectos verdaderos</strong>.</p></li>
-<li class="fragment"><p>La ponderación de los estudios entonces tiene en cuenta la varianza dentro del estudio (<span class="math inline">\(var_i\)</span>) y la heterogeneidad entre estudios (<span class="math inline">\(\tau^2\)</span>):</p>
-<p><span class="math display">\[w^*_i = \frac{1}{var_i + \tau^2}\]</span></p></li>
+<li class="fragment"><p>La ponderación de los estudios entonces tiene en cuenta la varianza dentro del estudio (<span class="math inline">\(S^2_i\)</span>) y la heterogeneidad entre estudios (<span class="math inline">\(\tau^2\)</span>):</p>
+<p><span class="math display">\[w^*_i = \frac{1}{S^2_i + \tau^2}\]</span></p></li>
 <li class="fragment"><p>Los métodos más comunes para estimar <span class="math inline">\(\tau^2\)</span> son:</p>
 <ul>
 <li class="fragment"><strong>Máxima verosimilitud restringida</strong> (REML)</li>
@@ -313,18 +313,14 @@
 
 <h3 id="medidas-de-heterogeneidad">Medidas de heterogeneidad</h3>
 <ul>
-<li class="fragment"><p><strong>tau-cuadrado</strong> (<span class="math inline">\(\tau^2\)</span>)</p>
-<ul>
-<li class="fragment"><p>Estima la <strong>varianza entre efectos verdaderos</strong>.</p></li>
-<li class="fragment"><p>Se utiliza para ponderar estudios en modelos de efectos aleatorios</p></li>
-</ul></li>
+<li class="fragment"><p><strong>tau-cuadrado</strong> (<span class="math inline">\(\tau^2\)</span>): Varianza entre efectos verdaderos.</p></li>
 <li class="fragment"><p><strong>Q de Cochran</strong>:</p>
 <ul>
 <li class="fragment"><p>Contrasta la hipótesis de efecto común.</p></li>
 <li class="fragment"><p>Sensible al número de estudios.</p></li>
 <li class="fragment"><p>No mide magnitud de la heterogeneidad.</p></li>
 </ul></li>
-<li class="fragment"><p><span class="math inline">\(H^2\)</span>: Razón entre la varianza total observada y la varianza esperada bajo el supuesto de homogeneidad.</p></li>
+<li class="fragment"><p><span class="math inline">\(H^2\)</span>: Razón entre la varianza total observada y la esperada bajo el supuesto de homogeneidad.</p></li>
 </ul>
 </section>
 <section class="slide level2">
@@ -336,12 +332,24 @@
 <li class="fragment"><p>Independiente del número de estudios.</p></li>
 <li class="fragment"><p>Interpretación:</p>
 <ul>
-<li class="fragment"><p>25%: baja</p></li>
-<li class="fragment"><p>50%: moderada</p></li>
-<li class="fragment"><p>75%: alta</p></li>
+<li class="fragment"><p><strong>0-25%</strong>: baja heterogeneidad</p></li>
+<li class="fragment"><p><strong>25-50%</strong>: heterogeneidad moderada</p></li>
+<li class="fragment"><p><strong>50-75%</strong>: heterogeneidad sustancial</p></li>
+<li class="fragment"><p><strong>&gt;75%</strong>: alta heterogeneidad</p></li>
 </ul></li>
 </ul></li>
-<li class="fragment"><p><strong>Intervalo de predicción</strong>: Rango de valores que podrán tomar los estimadores de estudios futuros.</p></li>
+</ul>
+</section>
+<section class="slide level2">
+
+<ul>
+<li class="fragment"><p><strong>Intervalo de predicción</strong>:</p>
+<ul>
+<li class="fragment"><p>Predice el rango esperado del efecto en un nuevo estudio, considerando la evidencia existente.</p></li>
+<li class="fragment"><p>A diferencia del intervalo de confianza del efecto global, incorpora la <strong>heterogeneidad entre estudios</strong> (<span class="math inline">\(\tau^2\)</span>).</p></li>
+<li class="fragment"><p>Complementa la interpretación del <span class="math inline">\(I^2\)</span> y <span class="math inline">\(\tau^2\)</span>.</p></li>
+<li class="fragment"><p>Indica si los resultados son consistentes entre estudios.</p></li>
+</ul></li>
 </ul>
 </section>
 <section id="meta-análisis-en-r" class="slide level2">
@@ -451,7 +459,7 @@
 </ul>
 <div class="fragment">
 <div class="cell" data-layout-align="center">
-<div class="sourceCode cell-code" id="cb6" data-code-line-numbers="1-2,7-8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href=""></a>mod <span class="ot">&lt;-</span> <span class="fu">metagen</span>(<span class="at">TE =</span> yi,    <span class="co"># Estimador de efecto         </span></span>
+<div class="sourceCode cell-code" id="cb6" data-code-line-numbers="1-2,7-9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href=""></a>mod <span class="ot">&lt;-</span> <span class="fu">metagen</span>(<span class="at">TE =</span> yi,    <span class="co"># Estimador de efecto         </span></span>
 <span id="cb6-2"><a href=""></a>               <span class="at">seTE =</span> vi,  <span class="co"># Varianza del estimador</span></span>
 <span id="cb6-3"><a href=""></a>               <span class="at">sm =</span> <span class="st">"SMD"</span>, <span class="co"># Diferencia de medias estandarizada</span></span>
 <span id="cb6-4"><a href=""></a>               <span class="at">studlab =</span> study,    </span>
@@ -553,13 +561,13 @@ Details of meta-analysis methods:
 </div>
 </div>
 </section>
-<section id="funciones-metaxxx" class="slide level2">
-<h2>Funciones <code>metaxxx()</code></h2>
+<section id="funciones-meta___" class="slide level2">
+<h2>Funciones <code>meta___()</code></h2>
 <ul>
-<li class="fragment"><p>Permiten ajustar modelos de meta-análisis a partir de datos crudos sin necesidad de transformaciones previas.</p></li>
-<li class="fragment"><p>Se nombran siguiendo la estructura <code>metaxxx</code>, donde <code>xxx</code>es el tipo de datos o indicador.</p></li>
-<li class="fragment"><p>Ajustan modelos de efectos fijos y aleatorios y estiman indicadores de heterogeneidad.</p></li>
-<li class="fragment"><p>Devuelven los resultados en la escala original de los datos, aplicando la transformación inversa (argumento <code>backtransf = TRUE</code>).</p></li>
+<li class="fragment"><p>Permiten ajustar modelos de meta-análisis a partir de datos crudos.</p></li>
+<li class="fragment"><p>Se nombran siguiendo la estructura <code>meta__</code>, donde <code>___</code> es el tipo de datos o estimador de efecto.</p></li>
+<li class="fragment"><p>Realizan las transformaciones necesarias de los datos sin que tengamos que manipularlos previamente.</p></li>
+<li class="fragment"><p>Presentan los resultados en la escala original de los datos, aplicando la transformación inversa (argumento <code>backtransf = TRUE</code>).</p></li>
 </ul>
 </section>
 <section class="slide level2">
